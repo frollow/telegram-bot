@@ -22,21 +22,23 @@ def send_welcome(message):
 @bot.message_handler(commands=['lastnews'])
 def last_news(message):
     # or add KeyboardButton one row at a time:
-    markup = types.ReplyKeyboardMarkup()
+    markup = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True, one_time_keyboard=True)
     vacancy = types.KeyboardButton('Ищу работу')
     resume = types.KeyboardButton('Ищу сотрудника')
-    markup.row(vacancy, resume)
+    markup.add(vacancy, resume)
     bot.send_message(message.chat.id, "Что ты ищешь? Работу или сотрудника?", reply_markup=markup)
-    print(message.text)
+    print("Пользователь сделал выбор")
 
 
 @bot.message_handler(content_types='text')
 def send_news(message):
     if message.text == 'Ищу работу':
-        bot.send_message(message.chat.id, "Сейчас пришлю список объявлений с вакансиями.")
+        bot.send_message(message.chat.id, "Сейчас пришлю вакансии за "
+                                          "последние 24 часа.")
         response = requests.get(token_file.url_vk + token_file.method_vk,
                                 params=token_file.parameters_wall_vk)
         datas = response.json()['response']['items']
+        print('Данные пришли от VK')
         posts = []
         posts.clear()
         resume = []
@@ -44,36 +46,77 @@ def send_news(message):
         yesterday = int(time.time()) - 86400
         for data in datas:
             if '#Работа_в_Рудном' in data['text'] and data['date'] > yesterday:
-                print(208760)
+                print('Вакансия добавлена в общий список')
                 posts.append({
                     'date': data['date'],
                     'text': data['text'],
-                    'author': data['owner_id']
+                    'author': data['signer_id']
                 })
             elif '#Ищу_работу_в_Рудном' in data['text'] and data['date'] > yesterday:
-                print(9898)
+                print('Объявление о поиске работы добавлено в общий список')
                 resume.append({
                     'date': data['date'],
                     'text': data['text'],
-                    'author': data['owner_id']
+                    'author': data['signer_id']
                 })
             else:
                 pass
 
         for post in posts:
             text = post['text']
-            date = str(post['date'])
-            author = str(post['author'])
+            date = time.strftime("%d.%m.%Y | %H:%M:%S", time.gmtime(post['date']))
+            author = f"https://m.vk.com/id{post['author']}"
             full_post = \
                 f'''
 {text}
 
-Дата публикации: {date} 
+Дата: {date} 
 Автор: {author}
                 '''
             bot.send_message(message.chat.id, full_post)
     elif message.text == 'Ищу сотрудника':
-        bot.send_message(message.chat.id, "Сейчас пришлю список объявлений о поиске работы.")
+        bot.send_message(message.chat.id, "Сейчас пришлю список объявлений о поиске работы за "
+                                          "последние 24 часа.")
+        response = requests.get(token_file.url_vk + token_file.method_vk,
+                                params=token_file.parameters_wall_vk)
+        datas = response.json()['response']['items']
+        print('Данные пришли от VK')
+        posts = []
+        posts.clear()
+        resume = []
+        resume.clear()
+        yesterday = int(time.time()) - 86400
+        for data in datas:
+            if '#Работа_в_Рудном' in data['text'] and data['date'] > yesterday:
+                print('Вакансия добавлена в общий список')
+                posts.append({
+                    'date': data['date'],
+                    'text': data['text'],
+                    'author': data['signer_id']
+                })
+            elif '#Ищу_работу_в_Рудном' in data['text'] and data['date'] > yesterday:
+                print('Объявление о поиске работы добавлено в общий список')
+                resume.append({
+                    'date': data['date'],
+                    'text': data['text'],
+                    'author': data['signer_id']
+                })
+            else:
+                pass
+
+        for resum in resume:
+            text = resum['text']
+            date = time.strftime("%d.%m.%Y | %H:%M:%S", time.gmtime(resum['date']))
+            author = f"https://m.vk.com/id{resum['author']}"
+            full_post = \
+                f'''
+{text}
+
+Дата: {date} 
+Автор: {author}
+                        '''
+            bot.send_message(message.chat.id, full_post)
+
 
 
 @bot.message_handler(func=lambda m: True)
