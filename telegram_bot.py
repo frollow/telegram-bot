@@ -4,6 +4,7 @@ from telebot import types
 from telebot import apihelper
 import token_file
 import requests
+import csv
 
 # proxy can be taken from https://hideip.me/ru/proxy/socks5list
 apihelper.proxy = {'https': token_file.proxy_id}
@@ -16,7 +17,21 @@ def send_welcome(message):
                      text='Привет, ' + message.from_user.first_name + '! Рады тебя видеть')
     bot.send_message(message.chat.id,
                      text='Жми на /lastnews и мы пришлем свежие объявления.')
-    print(message)
+    try:
+        files_writer(message.json)
+    except:
+        pass
+
+
+def files_writer(users):
+    with open('parser_job.csv', 'a') as file:
+        # w - all information will be rewrite in the file every time
+        # a  - the new information will be added to the file
+        a_pen = csv.writer(file)
+        a_pen.writerow((users['from']['id'], users['from']['first_name'], users['from'][
+            'last_name'],
+                        users['from']['is_bot'],
+                        users['date']))
 
 
 @bot.message_handler(commands=['lastnews'])
@@ -74,6 +89,9 @@ def send_news(message):
 Автор: {author}
                 '''
             bot.send_message(message.chat.id, full_post)
+        if len(datas) == 0:
+            bot.send_message(message.chat.id,
+                             "Опаньки... А объявлений пока нет. Попробуй чуть позже.")
     elif message.text == 'Ищу сотрудника':
         bot.send_message(message.chat.id, "Сейчас пришлю список объявлений о поиске работы за "
                                           "последние 24 часа.")
@@ -116,7 +134,10 @@ def send_news(message):
 Автор: {author}
                         '''
             bot.send_message(message.chat.id, full_post)
-
+        if len(resume) == 0:
+            bot.send_message(message.chat.id,
+                             "Опаньки... А объявлений пока нет. Попробуй чуть позже.")
+        print(len(resume))
 
 
 @bot.message_handler(func=lambda m: True)
