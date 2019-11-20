@@ -24,7 +24,7 @@ def send_welcome(message):
 
 
 def files_writer(users):
-    with open('parser_job.csv', 'a') as file:
+    with open('parser_job.csv', 'a', encoding='utf-8') as file:
         # w - all information will be rewrite in the file every time
         # a  - the new information will be added to the file
         a_pen = csv.writer(file)
