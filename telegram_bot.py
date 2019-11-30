@@ -75,6 +75,8 @@ def send_news(message):
         bot.send_message(message.chat.id, "Сейчас пришлю список объявлений о поиске работы за "
                                           "последние 24 часа.")
         vk_group_posts('#Ищу_работу_в_Рудном', message)
+    else:
+        bot.reply_to(message, 'Сорри, я еще не знаю как обработать это сообщение.')
 
 
 def vk_data_take():
@@ -115,9 +117,9 @@ def vk_group_posts(hashtag, message):
         bot.send_message(message.chat.id, full_post)
 
 
-@bot.message_handler(func=lambda m: True)
-def echo_all(message):
-    bot.reply_to(message, 'Сорри, я не знаю как обработать это сообщение.')
+# @bot.message_handler(func=lambda m: True)
+# def echo_all(message):
+#     bot.reply_to(message, 'Сорри, я не еще знаю как обработать это сообщение.')
 
 
 # tested message to chat
