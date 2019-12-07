@@ -27,6 +27,31 @@ def send_welcome(message):
         pass
 
 
+@bot.message_handler(commands=['statadmin'])
+def stat_admin(message):
+    user_id = message.json['from']['id']
+    path = Path('users_list.json')
+    data = json.loads(path.read_text(encoding='utf-8'))
+    if user_id == 178253335:
+        count_look_for_job = 0
+        count_look_for_employer = 0
+        for i in range(len(data)):
+            if int(data[i]['telegram_id']) != 178253335:
+                count_look_for_job = count_look_for_job + int(data[i]['look_for_job'])
+                count_look_for_employer = count_look_for_employer + int(data[i]['look_for_employer'])
+            else:
+                print('Статистика отправлена. Данные админа не включены.')
+        stat_post = \
+            f'''
+Популярность кнопок
+Ищу работу: {count_look_for_job}
+Ищу сотрудника: {count_look_for_employer} 
+                    '''
+        bot.send_message(message.chat.id, stat_post)
+    else:
+        pass
+
+
 def user_in_the_list(message):
     user_id = message.json['from']['id']
     path = Path('users_list.json')
