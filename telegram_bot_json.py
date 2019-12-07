@@ -46,6 +46,7 @@ def stat_admin(message):
 Популярность кнопок
 Ищу работу: {count_look_for_job}
 Ищу сотрудника: {count_look_for_employer} 
+Количество пользователей: {len(data)}
                     '''
         bot.send_message(message.chat.id, stat_post)
     else:
