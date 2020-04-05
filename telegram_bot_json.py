@@ -3,7 +3,6 @@ from telebot import apihelper
 from telebot import types
 import token_file
 import requests
-import csv
 import json
 from pathlib import Path
 import time
@@ -46,7 +45,8 @@ def stat_admin(message):
 Популярность кнопок
 Ищу работу: {count_look_for_job}
 Ищу сотрудника: {count_look_for_employer} 
-Количество пользователей: {len(data)}
+
+Пользователей: {len(data)}
                     '''
         bot.send_message(message.chat.id, stat_post)
     else:
